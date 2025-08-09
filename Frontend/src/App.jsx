@@ -10,11 +10,13 @@ function App() {
   const [prompt, setPrompt] = useState("");
   const [reply, setReply] = useState(null);
   const [currThreadId, setThreadId] = useState(uuid());
+  const [loading, setLoading] = useState(false);
 
   const providerValues = {
     prompt,setPrompt,
     reply,setReply,
-    currThreadId,setThreadId
+    currThreadId,setThreadId,
+    loading, setLoading
   };
 
   return (

@@ -537,3 +537,23 @@
     transform: none;
     background: rgba(125, 133, 144, 0.3);
 }
+
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid transparent;
+    border-top: 2px solid #e6edf3;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+.submit-btn.loading {
+    background: rgba(48, 54, 61, 0.3);
+    cursor: not-allowed;
+    transform: scale(0.98);
+    box-shadow: none;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

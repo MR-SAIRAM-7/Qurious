@@ -4,9 +4,13 @@ import { MyContext } from "./MyContext.jsx";
 import { useContext } from "react";
 
 export default function ChatWindow() {
-    const { prompt, setPrompt, reply, setReply, currThreadId } = useContext(MyContext);
+    const { prompt, setPrompt, reply, setReply, currThreadId, loading, setLoading } = useContext(MyContext);
 
     const getReply = async () => {
+        if (!prompt.trim()) return;
+
+        setLoading(true);
+
         const options = {
             method: "POST",
             headers: {
@@ -19,7 +23,7 @@ export default function ChatWindow() {
         };
 
         try {
-            const response = await fetch("http://localhost:8080/api/chat", options); 
+            const response = await fetch("http://localhost:8080/api/chat", options);
             const data = await response.json();
             console.log("API Response:", data);
             if (data.reply) {
@@ -27,6 +31,8 @@ export default function ChatWindow() {
             }
         } catch (err) {
             console.error("Fetch error:", err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -113,7 +119,7 @@ export default function ChatWindow() {
                                 className="message-input"
                                 value={prompt}
                                 onChange={(e) => setPrompt(e.target.value)}
-                                onKeyDown={(e)=> e.key === "Enter"? getReply() :""}
+                                onKeyDown={(e) => e.key === "Enter" ? getReply() : ""}
                             ></textarea>
                             <div className="input-actions">
                                 <button className="attach-btn" title="Attach file">
@@ -123,13 +129,17 @@ export default function ChatWindow() {
                                     <i className="fa-solid fa-microphone"></i>
                                 </button>
                                 <button
-                                    className="submit-btn"
+                                    className={`submit-btn ${loading ? "loading" : ""}`}
                                     id="submit"
                                     title="Send message"
                                     onClick={getReply}
+                                    disabled={loading}
                                 >
-                                    <i className="fa-solid fa-paper-plane"></i>
+                                    {loading
+                                        ? <div className="spinner"></div>
+                                        : <i className="fa-solid fa-paper-plane"></i>}
                                 </button>
+
                             </div>
                         </div>
                         <div className="input-footer">
