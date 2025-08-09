@@ -1,7 +1,35 @@
-import "./ChatWindow.css"
-import Chat from "./Chat.jsx"
+import "./ChatWindow.css";
+import Chat from "./Chat.jsx";
+import { MyContext } from "./MyContext.jsx";
+import { useContext } from "react";
 
 export default function ChatWindow() {
+    const { prompt, setPrompt, reply, setReply, currThreadId } = useContext(MyContext);
+
+    const getReply = async () => {
+        const options = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: prompt,
+                threadId: currThreadId
+            })
+        };
+
+        try {
+            const response = await fetch("http://localhost:8080/api/chat", options); 
+            const data = await response.json();
+            console.log("API Response:", data);
+            if (data.reply) {
+                setReply(data.reply);
+            }
+        } catch (err) {
+            console.error("Fetch error:", err);
+        }
+    };
+
     return (
         <div className="chatWindow">
             {/* Enhanced Navbar */}
@@ -11,7 +39,7 @@ export default function ChatWindow() {
                         <span className="model-name">Qurious
                             <i className="fa-solid fa-chevron-down dropdown-icon"></i>
                         </span>
-                        
+
                         <div className="model-dropdown">
                             <div className="dropdown-item active">
                                 <div className="model-info">
@@ -35,7 +63,7 @@ export default function ChatWindow() {
                         </div>
                     </div>
                 </div>
-                
+
                 <div className="navbar-right">
                     <button className="nav-btn share-btn" title="Share conversation">
                         <i className="fa-solid fa-share"></i>
@@ -51,7 +79,7 @@ export default function ChatWindow() {
                                     <span className="user-email">sairam@example.com</span>
                                 </div>
                             </div>
-                            <hr className="dropdown-divider"/>
+                            <hr className="dropdown-divider" />
                             <div className="dropdown-item">
                                 <i className="fa-solid fa-cog"></i>
                                 <span>Settings</span>
@@ -79,10 +107,13 @@ export default function ChatWindow() {
                 <div className="input-container">
                     <div className="userInput">
                         <div className="input-wrapper">
-                            <textarea 
-                                placeholder="Message Qurious..." 
+                            <textarea
+                                placeholder="Message Qurious..."
                                 rows="1"
                                 className="message-input"
+                                value={prompt}
+                                onChange={(e) => setPrompt(e.target.value)}
+                                onKeyDown={(e)=> e.key === "Enter"? getReply() :""}
                             ></textarea>
                             <div className="input-actions">
                                 <button className="attach-btn" title="Attach file">
@@ -91,7 +122,12 @@ export default function ChatWindow() {
                                 <button className="voice-btn" title="Voice input">
                                     <i className="fa-solid fa-microphone"></i>
                                 </button>
-                                <button className="submit-btn" id="submit" title="Send message">
+                                <button
+                                    className="submit-btn"
+                                    id="submit"
+                                    title="Send message"
+                                    onClick={getReply}
+                                >
                                     <i className="fa-solid fa-paper-plane"></i>
                                 </button>
                             </div>
@@ -105,5 +141,5 @@ export default function ChatWindow() {
                 </div>
             </div>
         </div>
-    )
+    );
 }
